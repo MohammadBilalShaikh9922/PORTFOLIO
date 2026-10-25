@@ -7,6 +7,7 @@ import subprocess
 from bs4 import BeautifulSoup
 from docx import Document
 from docx.oxml.ns import qn
+from docx.shared import Pt
 
 ROOT = Path.cwd()
 TEMPLATE = ROOT / "Mohammad_Bilal_Shaikh.docx"
@@ -236,6 +237,58 @@ def generate():
             document, skill_line,
             f'Spoken Languages: {data["languages"]}'
         )
+
+    
+    # Apply Times New Roman to every run in the entire CV.
+    for paragraph in document.paragraphs:
+        for run in paragraph.runs:
+            run.font.name = "Times New Roman"
+            run.font.size = Pt(10)
+
+            # Set the font for all Word script types.
+            rpr = run._element.get_or_add_rPr()
+            rfonts = rpr.rFonts
+
+            if rfonts is None:
+                from docx.oxml import OxmlElement
+                rfonts = OxmlElement("w:rFonts")
+                rpr.insert(0, rfonts)
+
+            for font_attr in (
+                "ascii",
+                "hAnsi",
+                "eastAsia",
+                "cs",
+            ):
+                rfonts.set(qn(f"w:{font_attr}"), "Times New Roman")
+
+    # Apply the font to text inside tables too.
+    for table in document.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.name = "Times New Roman"
+                        run.font.size = Pt(10)
+
+                        rpr = run._element.get_or_add_rPr()
+                        rfonts = rpr.rFonts
+
+                        if rfonts is None:
+                            from docx.oxml import OxmlElement
+                            rfonts = OxmlElement("w:rFonts")
+                            rpr.insert(0, rfonts)
+
+                        for font_attr in (
+                            "ascii",
+                            "hAnsi",
+                            "eastAsia",
+                            "cs",
+                        ):
+                            rfonts.set(
+                                qn(f"w:{font_attr}"),
+                                "Times New Roman",
+                            )
 
     document.save(OUTPUT_DOCX)
 
