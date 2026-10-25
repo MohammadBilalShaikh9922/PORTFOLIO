@@ -1,23 +1,28 @@
 
-name: Generate Portfolio PDF
+name: Generate CV PDF
 
 on:
   push:
     branches:
       - main
-    paths-ignore:
-      - "portfolio.pdf"
+    paths:
+      - "index.html"
+      - "style.css"
+      - "script.js"
+      - "Mohammad_Bilal_Shaikh.docx"
+      - ".github/scripts/generate-cv.py"
+      - ".github/workflows/generate-portfolio-pdf.yml"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: portfolio-pdf-generation
+  group: generate-cv-pdf
   cancel-in-progress: false
 
 jobs:
-  generate-pdf:
+  generate-cv:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -25,28 +30,32 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          node-version: "22"
+          python-version: "3.12"
 
-      - name: Install PDF generation dependency
-        run: npm install --no-save playwright
-
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Generate portfolio PDF
-        run: node .github/scripts/generate-pdf.cjs
-
-      - name: Commit updated PDF
+      - name: Install Python dependencies
         run: |
-          if git status --porcelain -- portfolio.pdf | grep -q .; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add portfolio.pdf
-            git commit -m "chore: regenerate portfolio PDF"
-            git push
-          else
+          python -m pip install --upgrade pip
+          pip install python-docx beautifulsoup4
+
+      - name: Install LibreOffice
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libreoffice
+
+      - name: Generate CV PDF
+        run: python .github/scripts/generate-cv.py
+
+      - name: Commit generated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add portfolio.pdf
+          if git diff --cached --quiet; then
             echo "The generated PDF has not changed."
+          else
+            git commit -m "chore: update generated CV PDF"
+            git push
           fi
