@@ -1,0 +1,87 @@
+
+/* Print styles for the automatically generated portfolio PDF */
+
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  body {
+    width: 100% !important;
+    margin: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove interactive website controls from the PDF */
+  .site-header,
+  .menu-toggle,
+  .back-top,
+  .hero-actions,
+  .page-glow {
+    display: none !important;
+  }
+
+  /* Show content normally hidden until it scrolls into view */
+  .reveal {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Prevent cards and individual entries splitting unnecessarily */
+  .timeline-item,
+  .timeline-content,
+  .project-card,
+  .skill-card,
+  .education-card,
+  .contact-card,
+  .language-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Keep headings attached to the content that follows */
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Avoid clipping long text or cards */
+  main,
+  section,
+  .section,
+  .hero,
+  .split,
+  .timeline,
+  .education-list,
+  .contact-section {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  a {
+    overflow-wrap: anywhere;
+  }
+
+  img {
+    max-width: 100%;
+    break-inside: avoid;
+  }
+
+  /* Keep the footer in the exported document */
+  footer {
+    position: static !important;
+    break-inside: avoid;
+  }
+}
