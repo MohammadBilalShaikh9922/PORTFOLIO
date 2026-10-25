@@ -38,15 +38,17 @@ def extract_portfolio():
 
     name = clean(soup.select_one("h1")).replace("  ", " ")
 
+   
     contact_line = " | ".join(filter(None, [
         clean(phone),
-        clean(email),
+        "bilalshaikh1339@gmail.com",
         linkedin.get("href", "").replace("https://", "").replace("www.", "")
         if linkedin else "",
         github.get("href", "").replace("https://", "").replace("www.", "")
         if github else "",
         "Pune, Maharashtra, India",
     ]))
+
 
     education = []
     for card in soup.select(".education-card"):
